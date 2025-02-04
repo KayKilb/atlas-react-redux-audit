@@ -1,0 +1,25 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "persistor",
+    "redux-persist",
+    "DndContext",
+    "SortableContext",
+    "Tailwind",
+    "cSpell",
+    "props",
+    "bg-teal",
+    "text-blue",
+    "AppDispatch",
+    "RootState"
+  ],
+  "ignoreWords": [],
+  "ignorePaths": [
+    "**/node_modules/**",
+    "**/build/**",
+    "**/dist/**",
+    "**/*.min.*",
+    "**/vendor/**"
+  ]
+}
