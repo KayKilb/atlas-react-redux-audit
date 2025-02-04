@@ -21,62 +21,58 @@ import { moveCard } from "../slices/listsSlice";
 const Board: React.FC = () => {
   const dispatch = useDispatch();
   const lists = useSelector((state: RootState) => state.lists.lists);
-  const cards = useSelector((state: RootState) => state.cards.cards);
 
   const sensors = useSensors(
-    useSensor(MouseSensor, {
-      activationConstraint: {
-        distance: 5,
-      },
-    }),
+    useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
     useSensor(TouchSensor, {
-      activationConstraint: {
-        delay: 250,
-        tolerance: 5,
-      },
+      activationConstraint: { delay: 250, tolerance: 5 },
     }),
   );
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
-    if (over && active.id !== over.id) {
-      // active.id is the cardId being dragged
-      // over.id is the cardId being hovered over
+    // Check if drop target is valid
+    if (!over) return;
 
-      // Find the source and destination lists
-      let sourceListId: string | undefined;
-      let destinationListId: string | undefined;
+    const activeCardId = active.id as string;
 
-      // Iterate through lists to find which list contains the active card
-      for (const list of lists) {
-        if (list.cardIds.includes(active.id as string)) {
-          sourceListId = list.id;
-          break;
-        }
+    // Find the source list that contains the dragged card
+    let sourceListId: string | undefined;
+    for (const list of lists) {
+      if (list.cardIds.includes(activeCardId)) {
+        sourceListId = list.id;
+        break;
       }
+    }
 
-      // Iterate through lists to find which list contains the over card
+    if (!sourceListId) return;
+
+    let destinationListId: string | undefined;
+
+    // Determine if we are dropping on another card or directly on the list
+    if (lists.some((list) => list.id === over.id)) {
+      // Dropping directly on a list (empty area)
+      destinationListId = over.id as string;
+    } else {
+      // Dropping on another card, find the list containing that card
       for (const list of lists) {
         if (list.cardIds.includes(over.id as string)) {
           destinationListId = list.id;
           break;
         }
       }
+    }
 
-      if (
-        sourceListId &&
-        destinationListId &&
-        sourceListId !== destinationListId
-      ) {
-        dispatch(
-          moveCard({
-            sourceListId,
-            destinationListId,
-            cardId: active.id as string,
-          }),
-        );
-      }
+    if (destinationListId && sourceListId !== destinationListId) {
+      // Move the card to the destination list
+      dispatch(
+        moveCard({
+          sourceListId,
+          destinationListId,
+          cardId: activeCardId,
+        }),
+      );
     }
   };
 
