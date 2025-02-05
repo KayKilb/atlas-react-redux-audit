@@ -1,6 +1,5 @@
 // src/components/Card.tsx
 import React from "react";
-import DeleteCardButton from "./DeleteCardButton";
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 
@@ -12,19 +11,19 @@ interface CardProps {
 }
 
 const Card: React.FC<CardProps> = ({
+  cardId,
   title,
   description,
   onDelete,
-  cardId,
 }) => {
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({
       id: cardId,
     });
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    opacity: isDragging ? 0.5 : 1,
+  const style: React.CSSProperties = {
+    transform: CSS.Translate.toString(transform),
+    opacity: isDragging ? 0.5 : 1, // Dim the card when dragging
   };
 
   return (
@@ -36,15 +35,18 @@ const Card: React.FC<CardProps> = ({
       {...attributes}
     >
       {/* Delete Card Button */}
-      <DeleteCardButton onDelete={onDelete} />
+      <button
+        onClick={onDelete}
+        className="text-red-500 absolute right-2 top-2"
+      >
+        ✖
+      </button>
 
       {/* Card Title */}
-      <h5 className="my-2 flex w-full items-center justify-between text-xl font-black">
-        <span>{title}</span>
-      </h5>
+      <h5 className="my-2 text-xl font-bold">{title}</h5>
 
       {/* Card Description */}
-      <p className="text-blue-900 mt-0 text-left text-lg">{description}</p>
+      <p className="text-blue-900 mt-1">{description}</p>
     </div>
   );
 };

@@ -21,62 +21,41 @@ import { moveCard } from "../slices/listsSlice";
 const Board: React.FC = () => {
   const dispatch = useDispatch();
   const lists = useSelector((state: RootState) => state.lists.lists);
-  const cards = useSelector((state: RootState) => state.cards.cards);
 
   const sensors = useSensors(
-    useSensor(MouseSensor, {
-      activationConstraint: {
-        distance: 5,
-      },
-    }),
+    useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
     useSensor(TouchSensor, {
-      activationConstraint: {
-        delay: 250,
-        tolerance: 5,
-      },
+      activationConstraint: { delay: 250, tolerance: 5 },
     }),
   );
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
-    if (over && active.id !== over.id) {
-      // active.id is the cardId being dragged
-      // over.id is the cardId being hovered over
+    if (!over) return; // Exit if no drop target is detected
 
-      // Find the source and destination lists
-      let sourceListId: string | undefined;
-      let destinationListId: string | undefined;
+    const activeCardId = active.id as string;
 
-      // Iterate through lists to find which list contains the active card
-      for (const list of lists) {
-        if (list.cardIds.includes(active.id as string)) {
-          sourceListId = list.id;
-          break;
-        }
-      }
+    // Find the source list containing the dragged card
+    const sourceList = lists.find((list) =>
+      list.cardIds.includes(activeCardId),
+    );
+    if (!sourceList) return; // Exit if the source list isn't found
 
-      // Iterate through lists to find which list contains the over card
-      for (const list of lists) {
-        if (list.cardIds.includes(over.id as string)) {
-          destinationListId = list.id;
-          break;
-        }
-      }
+    // Determine the destination list
+    const destinationList = lists.find(
+      (list) => list.id === over.id || list.cardIds.includes(over.id as string),
+    );
 
-      if (
-        sourceListId &&
-        destinationListId &&
-        sourceListId !== destinationListId
-      ) {
-        dispatch(
-          moveCard({
-            sourceListId,
-            destinationListId,
-            cardId: active.id as string,
-          }),
-        );
-      }
+    if (destinationList && sourceList.id !== destinationList.id) {
+      // Dispatch the moveCard action to update Redux state
+      dispatch(
+        moveCard({
+          sourceListId: sourceList.id,
+          destinationListId: destinationList.id,
+          cardId: activeCardId,
+        }),
+      );
     }
   };
 
