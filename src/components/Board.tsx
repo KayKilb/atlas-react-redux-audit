@@ -21,41 +21,62 @@ import { moveCard } from "../slices/listsSlice";
 const Board: React.FC = () => {
   const dispatch = useDispatch();
   const lists = useSelector((state: RootState) => state.lists.lists);
+  const cards = useSelector((state: RootState) => state.cards.cards);
 
   const sensors = useSensors(
-    useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(MouseSensor, {
+      activationConstraint: {
+        distance: 5,
+      },
+    }),
     useSensor(TouchSensor, {
-      activationConstraint: { delay: 250, tolerance: 5 },
+      activationConstraint: {
+        delay: 250,
+        tolerance: 5,
+      },
     }),
   );
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
-    if (!over) return;
+    if (over && active.id !== over.id) {
+      // active.id is the cardId being dragged
+      // over.id is the cardId being hovered over
 
-    const activeCardId = active.id as string;
+      // Find the source and destination lists
+      let sourceListId: string | undefined;
+      let destinationListId: string | undefined;
 
-    // Find the source list containing the dragged card
-    const sourceListId = lists.find((list) =>
-      list.cardIds.includes(activeCardId),
-    )?.id;
-    if (!sourceListId) return;
+      // Iterate through lists to find which list contains the active card
+      for (const list of lists) {
+        if (list.cardIds.includes(active.id as string)) {
+          sourceListId = list.id;
+          break;
+        }
+      }
 
-    // Determine the destination list
-    const destinationListId = lists.find(
-      (list) => list.id === over.id || list.cardIds.includes(over.id as string),
-    )?.id;
+      // Iterate through lists to find which list contains the over card
+      for (const list of lists) {
+        if (list.cardIds.includes(over.id as string)) {
+          destinationListId = list.id;
+          break;
+        }
+      }
 
-    // Only proceed if moving to a new list
-    if (destinationListId && sourceListId !== destinationListId) {
-      dispatch(
-        moveCard({
-          sourceListId,
-          destinationListId,
-          cardId: activeCardId,
-        }),
-      );
+      if (
+        sourceListId &&
+        destinationListId &&
+        sourceListId !== destinationListId
+      ) {
+        dispatch(
+          moveCard({
+            sourceListId,
+            destinationListId,
+            cardId: active.id as string,
+          }),
+        );
+      }
     }
   };
 
@@ -66,15 +87,16 @@ const Board: React.FC = () => {
       onDragEnd={handleDragEnd}
     >
       <div className="w-full flex-grow overflow-x-auto bg-blue text-center">
-        {lists.map((list) => (
-          <SortableContext
-            key={list.id}
-            items={list.cardIds}
-            strategy={verticalListSortingStrategy}
-          >
-            <List listId={list.id} title={list.title} />
-          </SortableContext>
-        ))}
+        <SortableContext
+          items={lists.map((list) => list.id)}
+          strategy={verticalListSortingStrategy}
+        >
+          <div className="flex space-x-6">
+            {lists.map((list) => (
+              <List key={list.id} listId={list.id} title={list.title} />
+            ))}
+          </div>
+        </SortableContext>
       </div>
     </DndContext>
   );

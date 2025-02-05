@@ -62,16 +62,18 @@ const listsSlice = createSlice({
       );
 
       if (sourceList && destinationList) {
-        // Remove the card from the source list
+        // Remove cardId from source list
         sourceList.cardIds = sourceList.cardIds.filter((id) => id !== cardId);
-
-        // Add the card to the destination list
+        // Add cardId to destination list
         destinationList.cardIds.push(cardId);
       }
+    },
+    clearBoard: (state) => {
+      state.lists = [];
     },
   },
 });
 
-export const { addList, deleteList, addCardToList, moveCard } =
+export const { addList, deleteList, addCardToList, moveCard, clearBoard } =
   listsSlice.actions;
 export default listsSlice.reducer;
