@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Card from "./Card";
 import NewCardForm from "./NewCardForm";
 import DeleteListButton from "./DeleteListButton";
-import { deleteList, moveCard } from "../slices/listsSlice";
+import { deleteList } from "../slices/listsSlice"; // Keep only what's used here
 import { deleteCard, createCard } from "../slices/cardsSlice";
 import { RootState } from "../store";
 import Droppable from "../dnd/Droppable";
