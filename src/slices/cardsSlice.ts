@@ -40,11 +40,18 @@ const cardsSlice = createSlice({
     deleteCard: (state, action: PayloadAction<{ cardId: string }>) => {
       delete state.cards[action.payload.cardId];
     },
-    clearBoard: (state) => {
-      state.cards = {};
+    updateCardListId: (
+      state,
+      action: PayloadAction<{ cardId: string; newListId: string }>,
+    ) => {
+      const { cardId, newListId } = action.payload;
+      const card = state.cards[cardId];
+      if (card) {
+        card.listId = newListId; // Update the card's listId
+      }
     },
   },
 });
 
-export const { createCard, deleteCard, clearBoard } = cardsSlice.actions;
+export const { createCard, deleteCard, updateCardListId } = cardsSlice.actions;
 export default cardsSlice.reducer;

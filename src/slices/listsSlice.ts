@@ -1,4 +1,3 @@
-// src/slices/listsSlice.ts
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { v4 as uuidv4 } from "uuid";
 
@@ -62,18 +61,16 @@ const listsSlice = createSlice({
       );
 
       if (sourceList && destinationList) {
-        // Remove cardId from source list
+        // Remove the card from the source list
         sourceList.cardIds = sourceList.cardIds.filter((id) => id !== cardId);
-        // Add cardId to destination list
+
+        // Add the card to the destination list
         destinationList.cardIds.push(cardId);
       }
-    },
-    clearBoard: (state) => {
-      state.lists = [];
     },
   },
 });
 
-export const { addList, deleteList, addCardToList, moveCard, clearBoard } =
+export const { addList, deleteList, addCardToList, moveCard } =
   listsSlice.actions;
 export default listsSlice.reducer;
