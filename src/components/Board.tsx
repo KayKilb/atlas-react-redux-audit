@@ -47,24 +47,17 @@ const Board: React.FC = () => {
       (list) => list.id === over.id || list.cardIds.includes(over.id as string),
     )?.id;
 
-if (destinationListId && sourceListId !== destinationListId) {
-  // Move the card in listsSlice
-  dispatch(
-    moveCard({
-      sourceListId,
-      destinationListId,
-      cardId: activeCardId,
-    })
-  );
-
-  // Update the card's listId in cardsSlice
-  dispatch(
-    updateCardListId({
-      cardId: activeCardId,
-      newListId: destinationListId,
-    })
-  );
-}
+    // Only proceed if moving to a new list
+    if (destinationListId && sourceListId !== destinationListId) {
+      dispatch(
+        moveCard({
+          sourceListId,
+          destinationListId,
+          cardId: activeCardId,
+        }),
+      );
+    }
+  };
 
   return (
     <DndContext
